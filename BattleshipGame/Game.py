@@ -5,7 +5,8 @@ from Board import Board
 from Ship import Ship
 
 
-class Game():
+class Game:
+
     # creates a game with given number of rows and columns (max ten rows)
     def __init__(self, numRow, numColumn):
 
@@ -57,6 +58,15 @@ class Game():
         # coordinates of ship of size 5
         self.ship_5 = None
 
+        # boolean to see if point is occupied by ship
+        self.find = False
+
+        # current x-position of user input
+        self.x = 0
+
+        # current y-position of user input
+        self.y = 0
+
     # creates a random orientation for ship
     def determineOrientation(self):
         num = randint(0, 1)
@@ -71,6 +81,7 @@ class Game():
     def generateShips(self):
         num = 0
         while num < 4:
+            self.find = False
             orientation = self.determineOrientation()
             size = num + 2
             x = randint(1, 9)
@@ -82,7 +93,14 @@ class Game():
             for point in coord:
                 for occupied in self.occupied:
                     if point == occupied:
-                        continue
+                        self.find = True
+                        break
+
+                if self.find:
+                    break
+
+            if self.find:
+                continue
 
             if size == 2:
                 self.ship_2 = ship.getCoordinates()
@@ -173,13 +191,13 @@ class Game():
                 else:
                     pointUV = PointUserVersion(self.userInput)
                     self.point = Point(pointUV.getX(), pointUV.getY())
-                    x = int(pointUV.getX())
-                    y = int(pointUV.getY())
+                    self.x = int(pointUV.getX())
+                    self.y = int(pointUV.getY())
                     if self.shotContains():
                         print("Shot taken at given point, try again.")
                         continue
                     else:
-                        self.board.changeSpotToX(x, y)
+                        self.board.changeSpotToX(self.x, self.y)
                         self.shots.append(self.point)
                         self.noInput = False
 
@@ -197,7 +215,7 @@ class Game():
 
     # determines if user wishes to play new game
     def newGame(self):
-        userInput = input("Press Y if you want to play again. N if you don't: ")
+        userInput = input("Press Y if you want to play again. N if you don't: ").upper()
 
         if userInput == "Y":
             self.board = Board(self.numRow, self.numCol)
@@ -220,6 +238,7 @@ class Game():
             print("Invalid character entered.")
             self.newGame()
 
+    # TODO: delete after
     def printOccupied(self):
         for occupied in self.occupied:
             occupied.printPoint()
@@ -231,11 +250,14 @@ class Game():
         self.generateShips()
         self.board.createBoard()
         self.printOccupied()
+
         while self.gameStatus:
             self.printTurn()
             self.board.printBoard()
             self.userPointInput()
+
             if self.occupiedContains():
+                self.board.changeSpotIfHit(self.x, self.y)
                 print("You hit the ship!")
                 self.occupied.remove(self.point)
                 self.turn += 1

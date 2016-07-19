@@ -40,6 +40,10 @@ class Board:
     def changeSpotToO(self, x, y):
         self.board[x][y] = "O"
 
+    # if ship is hit change position to specific character
+    def changeSpotIfHit(self, x, y):
+        self.board[x][y] = "*"
+
     # print the board to console
     def printBoard(self):
         for row in self.board:
