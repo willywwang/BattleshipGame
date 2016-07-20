@@ -310,7 +310,7 @@ class Game:
                 print("Invalid input. Please enter a point (ie. 3A).")
                 continue
 
-    # TODO: implement method
+    # TODO: implement method note where ships are 
     def opponentAIPointChooser(self):
         self.point = None
         self.x = randint(1, 9)
