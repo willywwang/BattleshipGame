@@ -6,7 +6,6 @@ from Ship import Ship
 
 
 class Game:
-
     # creates a game with given number of rows and columns (max ten rows)
     def __init__(self, numRow, numColumn):
 
@@ -46,17 +45,32 @@ class Game:
         # points that the player has shot at
         self.shots = []
 
-        # coordinates of ship of size 2
+        # points that the opponent has shot at
+        self.opponentShots = []
+
+        # coordinates of opponent ship of size 2
         self.ship_2 = None
 
-        # coordinates of ship of size 3
+        # coordinates of opponent ship of size 3
         self.ship_3 = None
 
-        # coordinates of ship of size 4
+        # coordinates of opponent ship of size 4
         self.ship_4 = None
 
-        # coordinates of ship of size 5
+        # coordinates of opponent ship of size 5
         self.ship_5 = None
+
+        # coordinates of user's ship of size 2
+        self.userShip_2 = None
+
+        # coordinates of user's ship of size 3
+        self.userShip_3 = None
+
+        # coordinates of user's ship of size 4
+        self.userShip_4 = None
+
+        # coordinates of user's ship of size 5
+        self.userShip_5 = None
 
         # boolean to see if point is occupied by ship
         self.find = False
@@ -67,6 +81,9 @@ class Game:
         # current y-position of user input
         self.y = 0
 
+        # users occupied ships
+        self.ownOccupied = []
+
     # creates a random orientation for ship
     def determineOrientation(self):
         num = randint(0, 1)
@@ -74,6 +91,50 @@ class Game:
             return "horizontal"
         else:
             return "vertical"
+
+            # generate opponent's ships, prevents overlapping of ships
+            # generates one - two length ship, one - three length ship, and
+            # one - four length ship,
+
+    def generateOwnShips(self):
+        num = 0
+        while num < 4:
+            self.find = False
+            orientation = self.determineOrientation()
+            size = num + 2
+            x = randint(1, 9)
+            y = randint(1, 9)
+            ship = Ship(size, orientation, x, y)
+            ship.createShip()
+            coord = ship.getCoordinates()
+
+            for point in coord:
+                for occupied in self.ownOccupied:
+                    if point == occupied:
+                        self.find = True
+                        break
+
+                if self.find:
+                    break
+
+            if self.find:
+                continue
+
+            if size == 2:
+                self.userShip_2 = ship.getCoordinates()
+
+            elif size == 3:
+                self.userShip_3 = ship.getCoordinates()
+
+            elif size == 4:
+                self.userShip_4 = ship.getCoordinates()
+
+            else:
+                self.userShip_5 = ship.getCoordinates()
+
+            num += 1
+            for point in coord:
+                self.ownOccupied.append(point)
 
     # generate opponent's ships, prevents overlapping of ships
     # generates one - two length ship, one - three length ship, and
@@ -118,7 +179,7 @@ class Game:
             for point in coord:
                 self.occupied.append(point)
 
-    # determines if point is occupied by a ship
+    # determines if point is occupied by a opponent's ship
     def occupiedContains(self):
         for occupied in self.occupied:
             if self.point == occupied:
@@ -129,14 +190,39 @@ class Game:
 
             else:
                 continue
+    # TODO: use in code
+    # determines if point is occupied by a user's ship
+    def userOccupiedContains(self):
+        for occupied in self.ownOccupied:
+            if self.point == occupied:
+                return True
 
-    #  determines if the player has taken a shot at the given point
+            elif occupied == self.ownOccupied[len(self.ownOccupied) - 1]:
+                return False
+
+            else:
+                continue
+
+    # determines if the player has taken a shot at the given point
     def shotContains(self):
         for point in self.shots:
             if self.point == point:
                 return True
 
             elif point == self.shots[len(self.shots) - 1]:
+                return False
+
+            else:
+                continue
+
+    # TODO: use in code
+    # determine if the opponent has taken a shot at the given point
+    def opponentShotContains(self):
+        for point in self.opponentShots:
+            if self.point == point:
+                return True
+
+            elif point == self.opponentShots[len(self.opponentShots) - 1]:
                 return False
 
             else:
@@ -159,6 +245,25 @@ class Game:
         for point4 in self.ship_5:
             if self.point == point4:
                 return self.ship_5
+
+    # TODO: use in code
+    # determines which ship contains the point
+    def ownShipContains(self):
+        for point1 in self.userShip_2:
+            if self.point == point1:
+                return self.userShip_2
+
+        for point2 in self.userShip_3:
+            if self.point == point2:
+                return self.userShip_3
+
+        for point3 in self.userShip_4:
+            if self.point == point3:
+                return self.userShip_4
+
+        for point4 in self.userShip_5:
+            if self.point == point4:
+                return self.userShip_5
 
     # prints the current turn to console
     def printTurn(self):
@@ -205,9 +310,23 @@ class Game:
                 print("Invalid input. Please enter a point (ie. 3A).")
                 continue
 
+    # TODO: implement method
+    def opponentAIPointChooser(self):
+        self.point = None
+        self.x = randint(1, 9)
+        self.y = randint(1, 9)
+
     # determines if all of opponents ships are down
-    def isGameOver(self):
+    def isUserWin(self):
         if not self.occupied:
+            return True
+
+        else:
+            return False
+
+    # TODO: use in code
+    def isUserLose(self):
+        if not self.ownOccupied:
             return True
 
         else:
@@ -248,6 +367,7 @@ class Game:
         self.gameStatus = True
         print("Game Start!")
         self.generateShips()
+        self.generateOwnShips()
         self.board.createBoard()
         self.printOccupied()
 
@@ -267,7 +387,7 @@ class Game:
                 if not ship:
                     print("Ship down!")
 
-                if self.isGameOver():
+                if self.isGUserWin():
                     print("You won!")
                     self.newGame()
             else:
