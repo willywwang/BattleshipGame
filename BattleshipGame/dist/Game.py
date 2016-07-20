@@ -84,6 +84,24 @@ class Game:
         # users occupied ships
         self.ownOccupied = []
 
+        # user's ship point where hit
+        self.pointHit = None
+
+        # boolean to determine if user's ship is down
+        self.isDown = False
+
+        # number of guesses opponent has made based off single point
+        self.opponentTries = 0
+
+        # boolean to determine if user's ship is hit
+        self.isHit = False
+
+        # opponent's turn number
+        self.opponentTurn = 1
+
+        # boolean to determine if opponent has chosen point
+        self.isPointChosen = False
+
     # creates a random orientation for ship
     def determineOrientation(self):
         num = randint(0, 1)
@@ -190,7 +208,7 @@ class Game:
 
             else:
                 continue
-    # TODO: use in code
+
     # determines if point is occupied by a user's ship
     def userOccupiedContains(self):
         for occupied in self.ownOccupied:
@@ -215,7 +233,6 @@ class Game:
             else:
                 continue
 
-    # TODO: use in code
     # determine if the opponent has taken a shot at the given point
     def opponentShotContains(self):
         for point in self.opponentShots:
@@ -246,7 +263,6 @@ class Game:
             if self.point == point4:
                 return self.ship_5
 
-    # TODO: use in code
     # determines which ship contains the point
     def ownShipContains(self):
         for point1 in self.userShip_2:
@@ -282,7 +298,7 @@ class Game:
                 alpha = self.userInput[1:2].upper()
 
                 if len(self.userInput) != 2:
-                    print("Invalid input. Please enter a point (ie. 3A).")
+                    print("Invalid input. Please enter a point (ie. 3A ).")
                     continue
 
                 elif num == 0:
@@ -310,11 +326,138 @@ class Game:
                 print("Invalid input. Please enter a point (ie. 3A).")
                 continue
 
-    # TODO: implement method note where ships are 
+    # TODO: implement method note where ships are
     def opponentAIPointChooser(self):
-        self.point = None
-        self.x = randint(1, 9)
-        self.y = randint(1, 9)
+        self.isPointChosen = False
+
+        while not self.isPointChosen:
+            self.point = None
+
+            if self.isDown:
+                self.isDown = False
+                self.opponentTries = 0
+                self.x = randint(1, 9)
+                self.y = randint(1, 9)
+                self.point = Point(self.x, self.y)
+                if self.opponentShotContains():
+                    continue
+
+                else:
+                    self.opponentShots.append(self.point)
+                    self.isPointChosen = True
+
+            elif self.pointHit is None:
+                self.opponentTries = 0
+                self.x = randint(1, 9)
+                self.y = randint(1, 9)
+                self.point = Point(self.x, self.y)
+                if self.opponentShotContains():
+                    continue
+
+                else:
+                    self.opponentShots.append(self.point)
+                    self.isPointChosen = True
+
+            else:
+                self.x = self.pointHit.getX()
+                self.y = self.pointHit.getY()
+
+                if self.y == 0:
+                    if self.opponentTries == 0:
+                        self.opponentTries = 1
+
+                elif self.y == 9:
+                    if self.opponentTries == 1:
+                        self.opponentTries = 3
+
+                elif self.x == 0:
+                    if self.opponentTries == 3:
+                        self.opponentTries = 4
+
+                if self.opponentTries == 0:
+                    self.point = Point(self.x, self.y + 1)
+                    if self.opponentShotContains():
+                        self.opponentTries += 1
+                        continue
+
+                    else:
+                        self.opponentShots.append(self.point)
+                        self.isPointChosen = True
+
+                if self.opponentTries == 1:
+                    self.point = Point(self.x, self.y - 1)
+                    if self.opponentShotContains():
+                        self.opponentTries += 1
+
+                    else:
+                        self.opponentShots.append(self.point)
+                        self.isPointChosen = True
+
+                if self.opponentTries == 2:
+                    self.point = Point(self.x - 1, self.y)
+                    if self.opponentShotContains():
+                        self.opponentTries += 1
+
+                    else:
+                        self.opponentShots.append(self.point)
+                        self.isPointChosen = True
+
+                if self.opponentTries == 3:
+                    self.point = Point(self.x + 1, self.y)
+                    if self.opponentShotContains():
+                        self.opponentTries += 1
+
+                    else:
+                        self.opponentShots.append(self.point)
+                        self.isPointChosen = True
+
+                if self.opponentTries == 4:
+                    self.opponentTries = 0
+                    self.x = randint(1, 9)
+                    self.y = randint(1, 9)
+                    self.pointHit = None
+                    self.point = Point(self.x, self.y)
+                    if self.opponentShotContains():
+                        continue
+
+                    else:
+                        self.opponentShots.append(self.point)
+                        self.isPointChosen = True
+
+    # TODO: implement method
+    def playOpponentTurn(self):
+        print("Opponent's Turn", self.opponentTurn)
+        print("Opponent choosing point...")
+        self.opponentAIPointChooser()
+        if self.userOccupiedContains():
+            print("Opponent has chose a point.")
+            print("Opponent hit your ship.")
+            self.pointHit = self.point
+            self.ownOccupied.remove(self.point)
+            ship = self.ownShipContains()
+            ship.remove(self.point)
+            self.opponentTurn += 1
+
+            if not ship:
+                print("Your ship is down.")
+                self.isDown = True
+                self.opponentTries = 0
+                self.pointHit = None
+
+            if self.isUserLose():
+                print("You lost.")
+                self.newGame()
+
+        elif self.pointHit is not None:
+            print("Opponent has chose a point.")
+            print("Opponent has missed your ship.")
+            self.opponentTries += 1
+            self.opponentTurn += 1
+
+        else:
+            print("Opponent has chose a point.")
+            print("Opponent has missed your ship.")
+            self.opponentTurn += 1
 
     # determines if all of opponents ships are down
     def isUserWin(self):
@@ -324,7 +467,6 @@ class Game:
         else:
             return False
 
-    # TODO: use in code
     def isUserLose(self):
         if not self.ownOccupied:
             return True
@@ -346,6 +488,26 @@ class Game:
             self.noInput = True
             self.userInput = ""
             self.point = None
+            self.shots = []
+            self.opponentShots = []
+            self.ship_2 = None
+            self.ship_3 = None
+            self.ship_4 = None
+            self.ship_5 = None
+            self.userShip_2 = None
+            self.userShip_3 = None
+            self.userShip_4 = None
+            self.userShip_5 = None
+            self.find = False
+            self.x = 0
+            self.y = 0
+            self.ownOccupied = []
+            self.pointHit = None
+            self.isDown = False
+            self.opponentTries = 0
+            self.isHit = False
+            self.opponentTurn = 1
+            self.isPointChosen = False
 
             self.playGame()
 
@@ -387,12 +549,19 @@ class Game:
                 if not ship:
                     print("Ship down!")
 
-                if self.isGUserWin():
-                    print("You won!")
-                    self.newGame()
+                    if self.isUserWin():
+                        print("You won!")
+                        self.newGame()
+
+                    else:
+                        self.playOpponentTurn()
+
+                else:
+                    self.playOpponentTurn()
             else:
                 print("You missed!")
                 self.turn += 1
+                self.playOpponentTurn()
 
 
 game = Game(10, 10)

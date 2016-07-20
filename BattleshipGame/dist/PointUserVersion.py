@@ -21,7 +21,7 @@ class PointUserVersion:
 
     # converts the letter to designated integer on board
     def convertAlphaToInt(self):
-        letter = self.alphaNum[1:2]
+        letter = self.alphaNum[1:2].upper()
         num = self.alphabet.index(letter) + 1
         return num
 
