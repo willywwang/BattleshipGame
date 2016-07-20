@@ -334,7 +334,7 @@ class Game:
 
     # determines if user wishes to play new game
     def newGame(self):
-        userInput = input("Press Y if you want to play again. N if you don't: ").upper()
+        userInput = input("Press Y if you want to play again. N if you don't: ").upper()    
 
         if userInput == "Y":
             self.board = Board(self.numRow, self.numCol)
