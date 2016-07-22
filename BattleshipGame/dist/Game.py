@@ -326,6 +326,9 @@ class Game:
                 print("Invalid input. Please enter a point (ie. 3A).")
                 continue
 
+    # Picks the point for A.I. to choose. A.I. is intelligent and
+    # realizes to pick points around where a ship is hit and also
+    # randomly picks point when no ship is hit or ship is down
     def opponentAIPointChooser(self):
         self.isPointChosen = False
 
@@ -423,6 +426,7 @@ class Game:
                         self.opponentShots.append(self.point)
                         self.isPointChosen = True
 
+    # plays the A.I.'s opponent's turn
     def playOpponentTurn(self):
         print("Opponent's Turn", self.opponentTurn)
         print("Opponent choosing point...")
@@ -543,16 +547,20 @@ class Game:
 
                     if self.isUserWin():
                         print("You won!")
+                        print()
                         self.newGame()
 
                     else:
+                        print()
                         self.playOpponentTurn()
 
                 else:
+                    print()
                     self.playOpponentTurn()
             else:
                 print("You missed!")
                 self.turn += 1
+                print()
                 self.playOpponentTurn()
 
 
