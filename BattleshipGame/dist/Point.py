@@ -17,10 +17,6 @@ class Point:
         else:
             return False
 
-    # TODO: delete after
-    def printPoint(self):
-        print(self.x, self.y)
-
     # return the x-coordinate of the point
     def getX(self):
         return self.x

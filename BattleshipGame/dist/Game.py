@@ -326,7 +326,6 @@ class Game:
                 print("Invalid input. Please enter a point (ie. 3A).")
                 continue
 
-    # TODO: implement method note where ships are
     def opponentAIPointChooser(self):
         self.isPointChosen = False
 
@@ -424,7 +423,6 @@ class Game:
                         self.opponentShots.append(self.point)
                         self.isPointChosen = True
 
-    # TODO: implement method
     def playOpponentTurn(self):
         print("Opponent's Turn", self.opponentTurn)
         print("Opponent choosing point...")
@@ -519,11 +517,6 @@ class Game:
             print("Invalid character entered.")
             self.newGame()
 
-    # TODO: delete after
-    def printOccupied(self):
-        for occupied in self.occupied:
-            occupied.printPoint()
-
     # create and play the battleship game
     def playGame(self):
         self.gameStatus = True
@@ -531,7 +524,6 @@ class Game:
         self.generateShips()
         self.generateOwnShips()
         self.board.createBoard()
-        self.printOccupied()
 
         while self.gameStatus:
             self.printTurn()
